@@ -1,0 +1,23 @@
+name: WorkflowCall - Deploy to GCS Bucket
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        description: Deployment environment
+        required: true
+      var:
+        type: string
+        required: true
+    secrets:
+      sec:
+        required: true
+jobs:
+  terraform-deploy:
+    environment:
+      name: ${{ inputs.environment }}
+    name: Terraform Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test
+        run: echo "${{ inputs.var }} - ${{ secrets.sec }}"

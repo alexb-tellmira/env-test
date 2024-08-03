@@ -1,0 +1,10 @@
+on:
+  push:
+    branches:
+      - '**'
+jobs:
+  dependencies:
+    uses: ./.github/workflows/_deploy.yml
+    secrets: inherit
+    with:
+      environment: dev
