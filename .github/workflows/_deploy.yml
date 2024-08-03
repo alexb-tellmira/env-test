@@ -20,4 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Test
-        run: echo "${{ inputs.var }} ${{ vars.VAR }}"
+        run: echo "${{ vars.VAR }}"
+      - run: |
+          if [[ ${{ secrets.SEC }} == 'SEC_VALUE_DEV' ]]; then
+            echo "dev"
+          else
+            echo "not dev"
+          fi
