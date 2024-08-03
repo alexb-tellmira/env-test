@@ -1,10 +1,9 @@
 on:
   workflow_dispatch:
 jobs:
-  deploy:
+  deploy_prod:
     runs-on: ubuntu-latest
-    environment:
-      name: dev
+    environment: prod
     uses: ./.github/workflows/_deploy.yml
     secrets: inherit
     with:

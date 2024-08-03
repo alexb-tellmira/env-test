@@ -3,10 +3,9 @@ on:
     branches:
       - '**'
 jobs:
-  deploy:
+  deploy_dev:
     runs-on: ubuntu-latest
-    environment:
-      name: dev
+    environment: dev
     uses: ./.github/workflows/_deploy.yml
     secrets: inherit
     with:
