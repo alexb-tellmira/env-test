@@ -3,13 +3,13 @@ on:
     branches:
       - '**'
 jobs:
-  test-root-workflow:
-    runs-on: ubuntu-latest
-    environment:
-      name: dev
-    steps:
-      - name: Test
-        run: echo "${{ vars.VAR }}"
+  # test-root-workflow:
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: dev
+  #   steps:
+  #     - name: Test
+  #       run: echo "${{ vars.VAR }}"
   deploy-dev:
     secrets: inherit
     uses: ./.github/workflows/_deploy.yml
