@@ -1,0 +1,9 @@
+on:
+  workflow_dispatch:
+jobs:
+  dependencies:
+    uses: ./.github/workflows/_deploy.yml
+    secrets: inherit
+    with:
+      environment: prod
+      var: ${{ vars.VAR }}
