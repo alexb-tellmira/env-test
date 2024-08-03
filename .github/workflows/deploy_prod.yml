@@ -4,9 +4,9 @@ jobs:
   deploy_prod:
     runs-on: ubuntu-latest
     environment: prod
+    secrets: inherit
     steps:
       - uses: ./.github/workflows/_deploy.yml
-        secrets: inherit
         with:
           environment: dev
           var: ${{ vars.VAR }}

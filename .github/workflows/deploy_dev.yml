@@ -6,9 +6,9 @@ jobs:
   deploy_dev:
     runs-on: ubuntu-latest
     environment: dev
+    secrets: inherit
     steps:
       - uses: ./.github/workflows/_deploy.yml
-        secrets: inherit
         with:
           environment: dev
           var: ${{ vars.VAR }}
