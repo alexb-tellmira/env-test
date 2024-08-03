@@ -9,9 +9,9 @@ on:
       var:
         type: string
         required: true
-    secrets:
-      sec:
-        required: true
+    # secrets:
+    #   sec:
+    #     required: true
 jobs:
   terraform-deploy:
     environment:
