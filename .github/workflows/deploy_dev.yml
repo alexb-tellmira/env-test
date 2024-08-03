@@ -3,7 +3,10 @@ on:
     branches:
       - '**'
 jobs:
-  dependencies:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: dev
     uses: ./.github/workflows/_deploy.yml
     secrets: inherit
     with:
