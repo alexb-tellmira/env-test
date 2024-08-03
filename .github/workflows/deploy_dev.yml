@@ -3,12 +3,15 @@ on:
     branches:
       - '**'
 jobs:
-  deploy_dev:
-    runs-on: ubuntu-latest
-    environment: dev
-    secrets: inherit
+  test-root-workflow:
+    environment:
+      name: dev
     steps:
-      - uses: ./.github/workflows/_deploy.yml
-        with:
-          environment: dev
-          var: ${{ vars.VAR }}
+      - name: Test
+        run: echo "${{ vars.VAR }}"
+  deploy-dev:
+    secrets: inherit
+    uses: ./.github/workflows/_deploy.yml
+    with:
+      environment: dev
+      var: ${{ vars.VAR }}
