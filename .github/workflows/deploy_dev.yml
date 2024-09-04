@@ -10,6 +10,26 @@ jobs:
   #   steps:
   #     - name: Test
   #       run: echo "${{ vars.VAR }}"
+
+  test-changed-files:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: 'actions/checkout@v4'
+      - name: Run changed-files with dir_names
+        id: changed-files-dir-names
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            apps/*/supabase/**
+          dir_names: "true"
+      - name: List all chnaged dirs
+        env:
+          DIRS: ${{ steps.changed-files-dir-names.outputs.any_changed }}
+        run: |
+          for dir in ${DIRS}; do
+            echo "$dir was changed"
+          done
+
   deploy-dev:
     secrets: inherit
     uses: ./.github/workflows/_deploy.yml
