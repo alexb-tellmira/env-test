@@ -27,12 +27,16 @@ jobs:
           DIRS: ${{ steps.changed-files-dir-names.outputs.all_changed_files }}
         run: |
           for dir in ${DIRS}; do
-            echo "$dir was changed"
+            SEGMENT=$(echo "$DIR" | cut -d'/' -f2)
+            RESULT+=("$SEGMENT")
+            echo "$SEGMENT was changed"
+            echo "apps="$(jq -c -n '$ARGS.positional' --args "${RESULT[@]}") >> $GITHUB_OUTPUT
           done
 
-  deploy-dev:
-    secrets: inherit
-    uses: ./.github/workflows/_deploy.yml
-    with:
-      environment: dev
-      var: ${{ vars.VAR }}
+
+  # deploy-dev:
+  #   secrets: inherit
+  #   uses: ./.github/workflows/_deploy.yml
+  #   with:
+  #     environment: dev
+  #     var: ${{ vars.VAR }}
