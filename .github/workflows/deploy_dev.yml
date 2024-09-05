@@ -16,7 +16,7 @@ jobs:
   test-changed-files:
     runs-on: ubuntu-latest
     outputs:
-      apps: ${{ steps.changed-dirs.outputs.apps }}
+      apps: ${{ steps.changed-dirs-js.outputs.result }}
     steps:
       - uses: 'actions/checkout@v4'
       - name: Run changed-files with dir_names
@@ -26,6 +26,7 @@ jobs:
           files: |
             apps/*/supabase/**
           dir_names: "true"
+          separator: ","
       - name: List all changed dirs
         id: changed-dirs
         env:
