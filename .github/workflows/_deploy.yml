@@ -20,8 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ inputs.dir }}
+        working-directory: apps
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Test
         run: pwd
       - name: See files
