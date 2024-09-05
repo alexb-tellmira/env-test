@@ -9,6 +9,7 @@ on:
         required: true
 jobs:
   deploy_prod:
+    if: github.ref == 'refs/heads/main'
     secrets: inherit
     uses: ./.github/workflows/_deploy.yml
     with:
