@@ -46,5 +46,5 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/_deploy.yml
     with:
-      environment: dev
+      environment: dev-${{ matrix.app }}
       var: ${{ vars.VAR }}
