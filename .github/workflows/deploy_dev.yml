@@ -39,6 +39,7 @@ jobs:
 
   deploy-dev:
     needs: test-changed-files
+    if: ${{ needs.test-changed-files.outputs.apps != '[]' && needs.test-changed-files.outputs.apps != '' }}
     strategy:
       matrix:
         app: ${{ fromJson(needs.test-changed-files.outputs.apps) }}
