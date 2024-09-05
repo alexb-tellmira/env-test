@@ -49,4 +49,4 @@ jobs:
     uses: ./.github/workflows/_deploy.yml
     with:
       environment: dev-${{ matrix.app }}
-      var: ${{ vars.VAR }}
+      dir: apps/${{ matrix.app }}

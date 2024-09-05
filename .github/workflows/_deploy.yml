@@ -6,7 +6,7 @@ on:
         type: string
         description: Deployment environment
         required: true
-      var:
+      dir:
         type: string
         required: true
     # secrets:
@@ -18,9 +18,14 @@ jobs:
       name: ${{ inputs.environment }}
     name: Terraform Deploy
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.dir }}
     steps:
       - name: Test
-        run: echo "${{ vars.VAR }}"
+        run: pwd
+      - name: See files
+        run: ls -la
       - run: |
           if [[ ${{ secrets.SEC }} == 'SEC_VALUE_DEV' ]]; then
             echo "dev"
