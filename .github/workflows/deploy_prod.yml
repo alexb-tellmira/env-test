@@ -1,5 +1,12 @@
 on:
   workflow_dispatch:
+    inputs:
+      app:
+        description: 'App'
+        type: choice
+        options:
+          - exam
+        required: true
 jobs:
   deploy_prod:
     runs-on: ubuntu-latest
@@ -8,5 +15,5 @@ jobs:
     steps:
       - uses: ./.github/workflows/_deploy.yml
         with:
-          environment: dev
+          environment: dev-${{ github.event.inputs.app }}
           var: ${{ vars.VAR }}

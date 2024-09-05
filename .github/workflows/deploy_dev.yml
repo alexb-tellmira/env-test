@@ -2,6 +2,8 @@ on:
   push:
     branches:
       - '**'
+    paths:
+      - "apps/*/supabase/**"
 jobs:
   # test-root-workflow:
   #   runs-on: ubuntu-latest
