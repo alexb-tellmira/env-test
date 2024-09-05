@@ -36,8 +36,27 @@ jobs:
             RESULT+=("$SEGMENT")
             echo "$SEGMENT was changed"
           done
+          UNIQUE_RESULT=($(echo "${RESULT[@]}" | tr ' ' '\n' | sort -u))
           echo "apps="$(jq -c -n '$ARGS.positional' --args "${RESULT[@]}")
-          echo "apps="$(jq -c -n '$ARGS.positional' --args "${RESULT[@]}") >> $GITHUB_OUTPUT
+          echo "unique_apps="$(jq -c -n '$ARGS.positional' --args "${UNIQUE_RESULT[@]}")
+          echo "apps="$(jq -c -n '$ARGS.positional' --args "${UNIQUE_RESULT[@]}") >> $GITHUB_OUTPUT
+
+      - name: List all changed dirs js
+        id: changed-dirs-js
+        env:
+          DIRS: ${{ steps.changed-files-dir-names.outputs.all_changed_files }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const affected_list = process.env.DIRS;
+            console.log(affected_list);
+            const affected = affected_list ? affected_list.split(' ').map(app => app.trim().split('/')[1]) : [];
+            console.log(affected);
+            const apps = [...new Set(affected)] // get unique values
+            console.log(apps);
+            return JSON.stringify(apps);
+
+          result-encoding: string
 
   deploy-dev:
     needs: test-changed-files
