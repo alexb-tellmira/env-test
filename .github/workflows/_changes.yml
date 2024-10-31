@@ -1,0 +1,28 @@
+name: WorkflowCall - Changes
+
+on:
+  workflow_call:
+    outputs:
+      account:
+        value: ${{ jobs.changes.outputs.account }}
+        description: "account changes"
+      exam:
+        value: ${{ jobs.changes.outputs.exam }}
+        description: "exam changes"
+
+jobs:
+  changes:
+    outputs:
+      account: ${{ steps.filter.outputs.account }}
+      exam: ${{ steps.filter.outputs.exam }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            account:
+              - 'apps/account/**'
+            exam:
+              - 'apps/exam/**'
