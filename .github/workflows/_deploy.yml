@@ -9,11 +9,15 @@ on:
       dir:
         type: string
         required: true
+      skip:
+        type: boolean
+        default: false
     # secrets:
     #   sec:
     #     required: true
 jobs:
   terraform-deploy:
+    if: ${{ !inputs.skip }}
     environment:
       name: ${{ inputs.environment }}
     name: Terraform Deploy
