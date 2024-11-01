@@ -29,8 +29,9 @@ jobs:
       - name: See files
         run: ls -la
       - run: |
-          if [[ ${{ secrets.SEC }} == 'SEC_VALUE_DEV' ]]; then
+          if [[ '${{ secrets.SEC }}' == 'SEC_VALUE_DEV' ]]; then
             echo "dev"
           else
             echo "not dev"
+            exit 1
           fi

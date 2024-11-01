@@ -62,12 +62,13 @@ jobs:
 
   deploy-dev:
     needs: test-changed-files
-    if: ${{ needs.test-changed-files.outputs.apps != '[]' && needs.test-changed-files.outputs.apps != '' }}
-    strategy:
-      matrix:
-        app: ${{ fromJson(needs.test-changed-files.outputs.apps) }}
+    # if: ${{ needs.test-changed-files.outputs.apps != '[]' && needs.test-changed-files.outputs.apps != '' }}
+    # strategy:
+    #   matrix:
+    #     app: ${{ fromJson(needs.test-changed-files.outputs.apps) }}
+    if: ${{ always() }}
     secrets: inherit
     uses: ./.github/workflows/_deploy.yml
     with:
-      environment: dev-${{ matrix.app }}
-      dir: apps/${{ matrix.app }}
+      environment: dev-test #${{ matrix.app }}
+      dir: apps/test #${{ matrix.app }}
