@@ -66,6 +66,7 @@ jobs:
     # strategy:
     #   matrix:
     #     app: ${{ fromJson(needs.test-changed-files.outputs.apps) }}
+    if: ${{ !failure() }}
     secrets: inherit
     uses: ./.github/workflows/_deploy.yml
     with:
