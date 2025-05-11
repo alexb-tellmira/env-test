@@ -1,0 +1,55 @@
+on:
+  workflow_dispatch:
+    # inputs:
+    #   app:
+    #     description: 'App'
+    #     type: choice
+    #     options:
+    #       - exam
+    #       - account
+    #     required: true
+    inputs: # Example inputs
+      exam:
+        description: "FE: Exam App"
+        type: boolean
+      account:
+        description: "FE: Account App"
+        type: boolean
+jobs:
+  # apps-to-deploy:
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     apps: ${{ steps.get-apps.outputs.apps }}
+  #   steps:
+  #     - name: Stage check
+  #       id: get-apps
+  #       run: |
+  #         if [ ${{ startsWith(github.ref, 'refs/tags/v') }} = true ]; then
+  #           echo "apps=exam" >> $GITHUB_OUTPUT
+  #         else
+  #           echo "apps=${{ github.event.inputs.app }}" >> $GITHUB_OUTPUT
+  #         fi
+  apps-to-deploy:
+    name: Get environment
+    runs-on: ubuntu-latest
+    outputs:
+      selectedJson: ${{ steps.get-selected-step.outputs.selected }}
+    steps:
+      - name: Get Selected
+        id: get-selected
+        uses: joao-zanutto/get-selected@v1.1.1
+        with:
+          separator: ","
+  deploy-prod:
+    runs-on: ubuntu-latest
+    needs: apps-to-deploy
+    steps:
+      - run: |
+          echo "${{ needs.get-selected.outputs.selected }}"
+    ${{ needs.get-selected.outputs.selected }}
+    # if: github.ref == 'refs/heads/main'
+    # secrets: inherit
+    # uses: ./.github/workflows/_deploy.yml
+    # with:
+    #   environment: dev-${{ github.event.inputs.app }}
+    #   dir: apps/${{ needs.apps-to-deploy.outputs.apps }} #apps/${{ github.event.inputs.app }}
