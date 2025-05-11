@@ -16,8 +16,15 @@ on:
     #   sec:
     #     required: true
 jobs:
-  terraform-deploy:
+  before-deploy:
+    runs-on: ubuntu-latest
     if: ${{ !inputs.skip }}
+    steps:
+      - name: Test
+        run: exit 0
+  terraform-deploy:
+    needs: before-deploy
+    # if: ${{ cancelled() || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'failure') }}
     environment:
       name: ${{ inputs.environment }}
     name: Terraform Deploy
@@ -26,6 +33,9 @@ jobs:
       run:
         working-directory: ${{ inputs.dir }}
     steps:
+      # - run: |
+      #     echo "Some workflows have failed!"
+      #     exit 1
       - name: Checkout
         uses: actions/checkout@v4
       - name: Test

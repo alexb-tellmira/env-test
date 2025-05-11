@@ -11,9 +11,10 @@ jobs:
   #     name: dev
   #   steps:
   #     - name: Test
-  #       run: echo "${{ vars.VAR }}"
+  #       run: bash --version
 
   changes:
+    # if: ${{ false }}
     uses: ./.github/workflows/_changes.yml
 
   test-changed-files:
@@ -23,43 +24,43 @@ jobs:
     outputs:
       apps: ${{ steps.changed-dirs-js.outputs.result }}
     steps:
-      - run: exit 1
-      - uses: 'actions/checkout@v4'
-      - name: Run changed-files with dir_names
-        id: changed-files-dir-names
-        uses: tj-actions/changed-files@v45
-        with:
-          files: |
-            apps/*/supabase/**
-          dir_names: "true"
-          separator: ","
-      - name: List all changed dirs
-        id: changed-dirs
-        env:
-          DIRS: ${{ steps.changed-files-dir-names.outputs.all_changed_files }}
-        run: |
-          for DIR in ${DIRS}; do
-            SEGMENT=$(echo "$DIR" | cut -d'/' -f2)
-            RESULT+=("$SEGMENT")
-            echo "$SEGMENT was changed"
-          done
-          UNIQUE_RESULT=($(echo "${RESULT[@]}" | tr ' ' '\n' | sort -u))
-          echo "apps="$(jq -c -n '$ARGS.positional' --args "${RESULT[@]}")
-          echo "unique_apps="$(jq -c -n '$ARGS.positional' --args "${UNIQUE_RESULT[@]}")
-          echo "apps="$(jq -c -n '$ARGS.positional' --args "${UNIQUE_RESULT[@]}") >> $GITHUB_OUTPUT
+      - run: exit 0
+  #     - uses: 'actions/checkout@v4'
+  #     - name: Run changed-files with dir_names
+  #       id: changed-files-dir-names
+  #       uses: tj-actions/changed-files@v45
+  #       with:
+  #         files: |
+  #           apps/*/supabase/**
+  #         dir_names: "true"
+  #         separator: ","
+  #     - name: List all changed dirs
+  #       id: changed-dirs
+  #       env:
+  #         DIRS: ${{ steps.changed-files-dir-names.outputs.all_changed_files }}
+  #       run: |
+  #         for DIR in ${DIRS}; do
+  #           SEGMENT=$(echo "$DIR" | cut -d'/' -f2)
+  #           RESULT+=("$SEGMENT")
+  #           echo "$SEGMENT was changed"
+  #         done
+  #         UNIQUE_RESULT=($(echo "${RESULT[@]}" | tr ' ' '\n' | sort -u))
+  #         echo "apps="$(jq -c -n '$ARGS.positional' --args "${RESULT[@]}")
+  #         echo "unique_apps="$(jq -c -n '$ARGS.positional' --args "${UNIQUE_RESULT[@]}")
+  #         echo "apps="$(jq -c -n '$ARGS.positional' --args "${UNIQUE_RESULT[@]}") >> $GITHUB_OUTPUT
 
-      - name: List all changed dirs js
-        id: changed-dirs-js
-        env:
-          DIRS: ${{ steps.changed-files-dir-names.outputs.all_changed_files }}
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const affected = process.env.DIRS ? process.env.DIRS.split(',').map(app => app.trim().split('/')[1]) : []; // get path segments corresponding to the app
-            const apps = [...new Set(affected)] // get unique values only
-            return JSON.stringify(apps);
+  #     - name: List all changed dirs js
+  #       id: changed-dirs-js
+  #       env:
+  #         DIRS: ${{ steps.changed-files-dir-names.outputs.all_changed_files }}
+  #       uses: actions/github-script@v7
+  #       with:
+  #         script: |
+  #           const affected = process.env.DIRS ? process.env.DIRS.split(',').map(app => app.trim().split('/')[1]) : []; // get path segments corresponding to the app
+  #           const apps = [...new Set(affected)] // get unique values only
+  #           return JSON.stringify(apps);
 
-          result-encoding: string
+  #         result-encoding: string
 
   deploy-dev:
     needs: [changes, test-changed-files]
@@ -73,4 +74,4 @@ jobs:
     with:
       environment: dev-test #${{ matrix.app }}
       dir: apps/account #${{ matrix.app }}
-      skip: ${{ needs.changes.outputs.account == 'false' }}
+      skip: ${{ needs.changes.outputs.exam == 'true' }}
