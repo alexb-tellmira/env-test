@@ -46,7 +46,6 @@ jobs:
     steps:
       - run: |
           echo "${{ needs.get-selected.outputs.selected }}"
-    ${{ needs.get-selected.outputs.selected }}
     # if: github.ref == 'refs/heads/main'
     # secrets: inherit
     # uses: ./.github/workflows/_deploy.yml
