@@ -33,7 +33,21 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       selected: ${{ steps.get-selected.outputs.selected }}
+      tag-check-passed: ${{ steps.check-tag.outputs.tag-check-passed }}
     steps:
+      - uses: actions/checkout@v4
+      - name: Fetch all tags
+        run: git fetch --depth=1 --tags
+      - name: Check if HEAD is tagged with a production-ready tag
+        id: check-tag
+        run: |
+          if git describe --tags --abbrev=0 --match 'v*' --exclude '*-rc*' --exact-match HEAD; then
+            echo "found"
+            echo "tag-check-passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "not found"
+            echo "tag-check-passed=false" >> $GITHUB_OUTPUT
+          fi
       - name: Get Selected
         id: get-selected
         uses: joao-zanutto/get-selected@v1.1.1
@@ -44,6 +58,7 @@ jobs:
     needs: apps-to-deploy
     steps:
       - run: |
+          echo "${{ needs.apps-to-deploy.outputs.tag-check-passed }}"
           echo "${{ needs.apps-to-deploy.outputs.selected }}"
     # if: github.ref == 'refs/heads/main'
     # secrets: inherit
