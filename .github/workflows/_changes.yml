@@ -23,10 +23,17 @@ jobs:
       exam: ${{ steps.filter.outputs.exam }}
     runs-on: ubuntu-latest
     steps:
+      - name: Debug input
+        run: |
+          echo "use_previous_release input: '${{ inputs.use_previous_release }}'"
+          echo "Type check: ${{ inputs.use_previous_release == true }}"
+          echo "String check: ${{ inputs.use_previous_release == 'true' }}"
+          echo "Calculated fetch-depth: ${{ inputs.use_previous_release == true && 0 || 1 }}"
+
       - uses: actions/checkout@v4
         with:
           # Fetch all history when comparing against previous release
-          fetch-depth: ${{ inputs.use_previous_release && 0 || 1 }}
+          fetch-depth: ${{ inputs.use_previous_release == true && 0 || 1 }}
 
       - name: Get previous release tag
         if: ${{ inputs.use_previous_release }}
