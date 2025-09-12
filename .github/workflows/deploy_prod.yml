@@ -12,24 +12,29 @@ on:
           - account
         required: true
 jobs:
-  apps-to-deploy:
-    runs-on: ubuntu-latest
-    outputs:
-      apps: ${{ steps.get-apps.outputs.apps }}
-    steps:
-      - name: Stage check
-        id: get-apps
-        run: |
-          if [ ${{ startsWith(github.ref, 'refs/tags/v') }} = true ]; then
-            echo "apps=exam" >> $GITHUB_OUTPUT
-          else
-            echo "apps=${{ github.event.inputs.app }}" >> $GITHUB_OUTPUT
-          fi
-  deploy_prod:
-    needs: apps-to-deploy
-    if: github.ref == 'refs/heads/main'
-    secrets: inherit
-    uses: ./.github/workflows/_deploy.yml
+  changes:
+    uses: ./.github/workflows/_changes.yaml
     with:
-      environment: dev-${{ github.event.inputs.app }}
-      dir: apps/${{ needs.apps-to-deploy.outputs.apps }} #apps/${{ github.event.inputs.app }}
+      use_previous_release: true
+
+  # apps-to-deploy:
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     apps: ${{ steps.get-apps.outputs.apps }}
+  #   steps:
+  #     - name: Stage check
+  #       id: get-apps
+  #       run: |
+  #         if [ ${{ startsWith(github.ref, 'refs/tags/v') }} = true ]; then
+  #           echo "apps=exam" >> $GITHUB_OUTPUT
+  #         else
+  #           echo "apps=${{ github.event.inputs.app }}" >> $GITHUB_OUTPUT
+  #         fi
+  # deploy_prod:
+  #   needs: apps-to-deploy
+  #   if: github.ref == 'refs/heads/main'
+  #   secrets: inherit
+  #   uses: ./.github/workflows/_deploy.yml
+  #   with:
+  #     environment: dev-${{ github.event.inputs.app }}
+  #     dir: apps/${{ needs.apps-to-deploy.outputs.apps }} #apps/${{ github.event.inputs.app }}

@@ -2,6 +2,12 @@ name: WorkflowCall - Changes
 
 on:
   workflow_call:
+    inputs:
+      use_previous_release:
+        description: "Whether to compare against previous release tag (for production) or use default git comparison (for development)"
+        required: false
+        type: boolean
+        default: false
     outputs:
       account:
         value: ${{ jobs.changes.outputs.account }}
@@ -18,6 +24,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Fetch all history when comparing against previous release
+          fetch-depth: ${{ inputs.use_previous_release && 0 || 1 }}
+
+      - name: Get previous release tag
+        if: ${{ inputs.use_previous_release }}
+        id: previous-tag
+        run: |
+          # Get the current tag from the ref
+          CURRENT_TAG=${GITHUB_REF#refs/tags/}
+          echo "current-tag=$CURRENT_TAG" >> $GITHUB_OUTPUT
+
+          # Get the previous release tag (excluding pre-releases)
+          PREVIOUS_TAG=$(git tag --sort=-version:refname --merged HEAD~1 | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+
+          # If no previous tag found, compare against initial commit
+          if [ -z "$PREVIOUS_TAG" ]; then
+            PREVIOUS_TAG=$(git rev-list --max-parents=0 HEAD)
+            echo "No previous release tag found, comparing against initial commit: $PREVIOUS_TAG"
+          else
+            echo "Comparing current tag $CURRENT_TAG with previous tag: $PREVIOUS_TAG"
+          fi
+
+          echo "previous-tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+
       - uses: dorny/paths-filter@v3
         id: filter
         with:
