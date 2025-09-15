@@ -15,7 +15,7 @@ jobs:
   changes:
     uses: ./.github/workflows/_changes.yml
     with:
-      use_previous_release: false
+      use_previous_release: true
 
   # apps-to-deploy:
   #   runs-on: ubuntu-latest

@@ -39,25 +39,17 @@ jobs:
       - name: Get previous release tag
         if: ${{ inputs.use_previous_release }}
         id: previous-tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Get the current tag from the ref
           CURRENT_TAG=${GITHUB_REF#refs/tags/}
           echo "current-tag=$CURRENT_TAG" >> $GITHUB_OUTPUT
-          echo "current-tag=$CURRENT_TAG"
 
-          echo $(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$')
+          # Get all release tags using gh, excluding the current one
+          PREVIOUS_TAG=$(gh release list --json tagName --jq '.[].tagName' | grep -v "^${CURRENT_TAG}$" | head -1)
 
-          # Get all release tags sorted by version, excluding the current one
-          PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | grep -v "^${CURRENT_TAG}$" | head -1)
-
-          # If no previous tag found, compare against initial commit
-          if [ -z "$PREVIOUS_TAG" ]; then
-            PREVIOUS_TAG=$(git rev-list --max-parents=0 HEAD)
-            echo "No previous release tag found, comparing against initial commit: $PREVIOUS_TAG"
-          else
-            echo "Comparing current tag $CURRENT_TAG with previous tag: $PREVIOUS_TAG"
-          fi
-
+          echo "Comparing current tag $CURRENT_TAG with previous tag: $PREVIOUS_TAG"
           echo "previous-tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
 
       - uses: dorny/paths-filter@v3
