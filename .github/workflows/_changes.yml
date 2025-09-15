@@ -63,6 +63,7 @@ jobs:
       - uses: dorny/paths-filter@v3
         id: filter
         with:
+          base: ${{ inputs.use_previous_release && steps.previous-tag.outputs.previous-tag || '' }}
           filters: |
             account:
               - 'apps/account/**'
