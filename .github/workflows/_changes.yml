@@ -65,10 +65,23 @@ jobs:
       - id: skip_check
         uses: fkirc/skip-duplicate-actions@v5
         with:
+          do_not_skip: '[]'
           paths_filter: |
             frontend:
               paths:
-                - 'frontend/**'
-            backend:
-              paths:
-                - 'backend/**'
+                - 'apps/**'
+            # backend:
+            #   paths:
+            #     - 'backend/**'
+      - name: Debug all skip_check outputs
+        run: |
+          echo "=== All Skip Check Outputs ==="
+          echo "paths_result: ${{ steps.skip_check.outputs.paths_result }}"
+          echo "should_skip: ${{ steps.skip_check.outputs.should_skip }}"
+          echo "skipped: ${{ steps.skip_check.outputs.skipped }}"
+          echo "============================="
+
+          # Alternative: Debug using toJSON for all outputs
+          echo "=== All outputs as JSON ==="
+          echo '${{ toJSON(steps.skip_check.outputs) }}'
+          echo "=========================="
