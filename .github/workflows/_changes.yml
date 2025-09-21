@@ -49,7 +49,7 @@ jobs:
           # Get all release tags using gh, excluding the current one
           PREVIOUS_TAG=$(gh release list --json tagName --jq '.[].tagName' | grep -v "^${CURRENT_TAG}$" | head -1)
 
-          echo "Comparing current tag $CURRENT_TAG with previous tag: $PREVIOUS_TAG"
+          echo "Comparing $CURRENT_TAG with previous tag: $PREVIOUS_TAG"
           echo "previous-tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
 
       - uses: dorny/paths-filter@v3
@@ -61,3 +61,14 @@ jobs:
               - 'apps/account/**'
             exam:
               - 'apps/exam/**'
+
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          paths_filter: |
+            frontend:
+              paths:
+                - 'frontend/**'
+            backend:
+              paths:
+                - 'backend/**'
