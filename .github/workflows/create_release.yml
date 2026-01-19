@@ -9,6 +9,8 @@ jobs:
   create:
     name: Create
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       # - name: Create draft release
       #   uses: softprops/action-gh-release@v1
