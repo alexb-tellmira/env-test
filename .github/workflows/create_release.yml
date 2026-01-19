@@ -1,6 +1,16 @@
 name: Action - Create Release
 on:
   workflow_dispatch:
+    inputs:
+      type:
+        description: 'Release type (patch, minor, or major)'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: patch
 
 env:
   NODE_VERSION: 18
