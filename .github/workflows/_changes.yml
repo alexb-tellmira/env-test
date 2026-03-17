@@ -85,3 +85,5 @@ jobs:
           echo "=== All outputs as JSON ==="
           echo '${{ toJSON(steps.skip_check.outputs) }}'
           echo "=========================="
+
+          echo "${{ (steps.skip-duplicate.outputs.paths_result != '' && fromJSON(steps.skip-duplicate.outputs.paths_result).frontend.should_skip == false) }}"
