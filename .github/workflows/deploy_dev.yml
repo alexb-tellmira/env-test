@@ -5,6 +5,7 @@ on:
       - main
     # paths:
     #   - "apps/*/supabase/**"
+  workflow_dispatch:
 jobs:
   # test-root-workflow:
   #   runs-on: ubuntu-latest
