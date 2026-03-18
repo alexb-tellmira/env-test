@@ -20,7 +20,8 @@ jobs:
   changes:
     outputs:
       account: ${{ steps.filter.outputs.account }}
-      exam: ${{ steps.filter.outputs.exam }}
+      exam: ${{ (steps.filter.outputs.exam == 'true' && github.event_name == 'pull_request' && github.event.action == 'ready_for_review') || (steps.skip-duplicate.outputs.paths_result != '' && fromJSON(steps.skip-duplicate.outputs.paths_result).exam.should_skip == false) }}
+
     runs-on: ubuntu-latest
     steps:
       - name: Debug input
