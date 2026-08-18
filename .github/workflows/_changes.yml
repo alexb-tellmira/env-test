@@ -20,7 +20,8 @@ jobs:
   changes:
     outputs:
       account: ${{ steps.filter.outputs.account }}
-      exam: ${{ steps.filter.outputs.exam }}
+      exam: ${{ (steps.filter.outputs.exam == 'true' && github.event_name == 'pull_request' && github.event.action == 'ready_for_review') || (steps.skip-duplicate.outputs.paths_result != '' && fromJSON(steps.skip-duplicate.outputs.paths_result).exam.should_skip == false) }}
+
     runs-on: ubuntu-latest
     steps:
       - name: Debug input
@@ -35,6 +36,24 @@ jobs:
         with:
           # Fetch all history when comparing against previous release
           fetch-depth: ${{ inputs.use_previous_release && '0' || '1' }}
+
+      - name: Cache lookup-only probe
+        id: cache_probe
+        uses: actions/cache@v4
+        with:
+          path: .cache-probe
+          key: cache-probe-${{ github.ref_name }}-v1
+          lookup-only: true
+
+      - name: Populate cache-probe directory
+        run: |
+          mkdir -p .cache-probe
+          echo "run=${{ github.run_id }} attempt=${{ github.run_attempt }}" > .cache-probe/probe.txt
+          ls -la .cache-probe
+
+      - name: Debug cache probe result
+        run: |
+          echo "cache-hit=${{ steps.cache_probe.outputs.cache-hit }}"
 
       - name: Get previous release tag
         if: ${{ inputs.use_previous_release }}

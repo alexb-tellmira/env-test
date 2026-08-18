@@ -6,6 +6,8 @@ on:
     # paths:
     #   - "apps/*/supabase/**"
   workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 jobs:
   # test-root-workflow:
   #   runs-on: ubuntu-latest
@@ -21,11 +23,49 @@ jobs:
 
   test-changed-files:
     runs-on: ubuntu-latest
-    needs: changes
-    if: ${{ needs.changes.outputs.account == 'true' }}
+    # needs: changes
+    # if: ${{ needs.changes.outputs.account == 'true' }}
     outputs:
       apps: ${{ steps.changed-dirs-js.outputs.result }}
     steps:
+      - name: Select Claude token from pool
+        id: token
+        if: steps.seen.outputs.cache-hit != 'true'
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN_0: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN_0 }}
+          CLAUDE_CODE_OAUTH_TOKEN_1: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN_1 }}
+          CLAUDE_CODE_OAUTH_TOKEN_2: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN_2 }}
+          CLAUDE_CODE_OAUTH_TOKEN_3: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN_3 }}
+          CLAUDE_CODE_OAUTH_TOKEN_4: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN_4 }}
+          CLAUDE_TOKEN_FALLBACK: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          TOKEN_KEYS=()
+          for key in ${!CLAUDE_CODE_OAUTH_TOKEN_@}; do
+            if [[ "$key" =~ ^CLAUDE_CODE_OAUTH_TOKEN_([0-9]+)$ ]] && [ -n "${!key}" ]; then
+              TOKEN_KEYS+=("${BASH_REMATCH[1]}:$key")
+            fi
+          done
+
+          if [ "${#TOKEN_KEYS[@]}" -gt 0 ]; then
+            mapfile -t SORTED_TOKEN_KEYS < <(printf '%s\n' "${TOKEN_KEYS[@]}" | sort -t: -k1,1n)
+            POOL_SIZE="${#SORTED_TOKEN_KEYS[@]}"
+            TOKEN_INDEX=$(( ${{ github.run_id }} % POOL_SIZE ))
+            SELECTED_KEY="${SORTED_TOKEN_KEYS[$TOKEN_INDEX]#*:}"
+            SELECTED_TOKEN="${!SELECTED_KEY}"
+            echo "Using token pool slot $TOKEN_INDEX of $POOL_SIZE (selected by run_id modulo pool size)."
+          elif [ -n "${CLAUDE_TOKEN_FALLBACK:-}" ]; then
+            SELECTED_TOKEN="$CLAUDE_TOKEN_FALLBACK"
+            echo "::warning::No numbered CLAUDE_CODE_OAUTH_TOKEN_* secrets found; falling back to CLAUDE_CODE_OAUTH_TOKEN."
+          else
+            echo "::error::No Claude token configured. Set CLAUDE_CODE_OAUTH_TOKEN_0 … CLAUDE_CODE_OAUTH_TOKEN_4 or CLAUDE_CODE_OAUTH_TOKEN."
+            exit 1
+          fi
+
+          echo "::add-mask::$SELECTED_TOKEN"
+          echo "token=$SELECTED_TOKEN" >> "$GITHUB_OUTPUT"
+
       - run: exit 0
   #     - uses: 'actions/checkout@v4'
   #     - name: Run changed-files with dir_names
@@ -70,10 +110,11 @@ jobs:
     # strategy:
     #   matrix:
     #     app: ${{ fromJson(needs.test-changed-files.outputs.apps) }}
-    if: ${{ !failure() }}
+    #if: ${{ !failure() }}
+    if: github.event.pull_request.draft != true
     secrets: inherit
     uses: ./.github/workflows/_deploy.yml
     with:
       environment: dev-test #${{ matrix.app }}
       dir: apps/account #${{ matrix.app }}
-      skip: ${{ needs.changes.outputs.exam == 'true' }}
+      skip: ${{ needs.changes.outputs.exam == 'false' }}
